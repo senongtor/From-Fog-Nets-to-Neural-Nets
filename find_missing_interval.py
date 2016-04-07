@@ -3,6 +3,9 @@ import pandas as pd
 import datetime
 import matplotlib.pyplot as plt
 
+'''
+Create parameter object for each file.
+'''
 class fileParam:
     def __init__(self):
         self.data_name = ''
@@ -18,6 +21,11 @@ class fileParam:
         self.end_time = param[3]
         self.interval = param[4]
 
+'''
+Assign the time from raw string in the file to datetime object.
+@param {string} time
+@return {!datetime}
+'''
 def assign_time(time):
     tmp = datetime.datetime.strptime('', '')
     if '-' in time:
@@ -32,6 +40,11 @@ def assign_time(time):
         print 'invalid time format'
     return tmp
 
+'''
+Get the interval from raw string in the file to number of minute.
+@param {string} interval
+@return {number}
+'''
 def get_interval_minute(interval):
     minute = 0
     if interval[-1] == 'h':
@@ -42,6 +55,13 @@ def get_interval_minute(interval):
         print 'invalid parameter'
     return minute
 
+'''
+Fix the interval with start time and end time.
+@param {!datetime} start_time
+@param {!datetime} end_time
+@param {!Array<!datetime>} interval
+@return {!Array<!Array<!datetime>>}
+'''
 def fix_interval(start_time, end_time, interval):
     result = []
     start_time_of_today = datetime.datetime(
@@ -66,23 +86,29 @@ def fix_interval(start_time, end_time, interval):
         result += fix_interval(start_time, end_time, [start_time_of_tomorrow, interval[1]])
         return result
 
+# Read the dataset.
 dataset_path = './dataset/'
 dataset_file_path = './dataset_file_path.csv'
 df_path = pd.read_csv(dataset_file_path)
 all_file_param = []
 
+# Save parameters for each file.
 for row in df_path.values:
     file_param = fileParam()
     file_param.get_param(row)
     all_file_param.append(file_param)
 
+# Initiate the plot.
 file_amount = len(all_file_param)
 cmap = plt.get_cmap('jet_r')
 plt.figure(figsize=(10, 10))
 plot_for_legend = plt.subplot()
 
+# Traverse all the dataset.
 for k in xrange(file_amount):
     file = all_file_param[k]
+
+    # Use this block to set which dataset you want to find missing intervals.
     # if file.data_name != 'Macroclimate Guelmim Airport':
     #     continue
 
@@ -106,22 +132,26 @@ for k in xrange(file_amount):
         current_time = assign_time(tmp)
         diff = current_time - prev_time
 
+        # Find out missing intervals with gap larger that the default interval.
         if diff.days or diff.seconds / 60 > get_interval_minute(interval):
             missing_interval = [prev_time, current_time]
             missing_data += fix_interval(start_time, end_time, missing_interval)
         prev_time = current_time
 
-    print len(missing_data)
-    # for item in missing_data:
-    #     print item[0].strftime('%Y-%m-%d %H:%M:%S'), \
-    #         item[1].strftime('%Y-%m-%d %H:%M:%S')
+    # Output all the missing intervals.
+    for item in missing_data:
+        print item[0].strftime('%Y-%m-%d %H:%M:%S'), \
+            item[1].strftime('%Y-%m-%d %H:%M:%S')
 
-    # plt.plot(missing_data, [k for j in xrange(len(missing_data))])
+    print len(missing_data), ' missing intervals are found.'
+
+    # Plot the missing intervals.
     for item in missing_data:
         plt.plot(item, [(k + 1) for j in xrange(2)], c=color)
     plt.ylim([0, file_amount + 1])
     plot_for_legend.plot([], [], c=color, label=file.data_name)
 
+# Set the position, legend, and subtitle of the plot.
 box = plot_for_legend.get_position()
 plot_for_legend.set_position([box.x0, box.y0, box.width, box.height * 0.6])
 plot_for_legend.set_position([box.x0, box.y0 + box.height * 0.2,
