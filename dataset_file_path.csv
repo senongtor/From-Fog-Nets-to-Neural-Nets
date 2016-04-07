@@ -1,0 +1,10 @@
+data_name,file_path,start_time,end_time,interval
+Macroclimate Agadir Airport,Macroclimate Agadir Airport.csv,00:00,00:00,1h
+Macroclimate Guelmim Airport,Macroclimate Guelmim Airport.csv,06:00,18:00,1h
+Macroclimate Sidi Ifni Weather Station,Macroclimate Sidi Ifni Weather Station.csv,06:00,18:00,3h
+Training set Microclimate (2 hour intervals),Training set Microclimate (2 hour intervals).csv,00:00,00:00,2h
+Training set Microclimate (5 minute intervals),Training set Microclimate (5 minute intervals).csv,00:00,00:00,5m
+Test set Microclimate (2 hour intervals),Test set Microclimate (2 hour intervals).csv,00:00,00:00,2h
+Test set Microclimate (5 min intervals),Test set Microclimate (5 min intervals).csv,00:00,00:00,5m
+Target Variable Water Yield,Target Variable Water Yield.csv,00:00,00:00,2h
+Submission format,Submission format.csv,00:00,00:00,2h
