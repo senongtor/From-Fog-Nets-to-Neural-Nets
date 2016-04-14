@@ -36,6 +36,7 @@ class microData:
         self.gusts_ms = []
         self.wind_dir = []
         self.wind_ms = []
+        self.output = []
 
     def get_data(self, data):
         raw_data_time = data[:, 0]
@@ -53,6 +54,9 @@ class microData:
         self.gusts_ms = data[:, 7]
         self.wind_dir = data[:, 8]
         self.wind_ms = data[:, 9]
+
+    def set_output(self, data):
+        self.output = data[:, 1]
 
     def read_feature(self, feature):
         if feature == 'percip_mm':
@@ -124,6 +128,12 @@ def read_all_dataset(path):
         all_file_param.append(file_param)
     return all_file_param
 
+'''
+Read all dataset and save parameters for each file.
+@param {string} dataset_path
+@param {string} plot_files
+@return {!Array<string>}
+'''
 def set_features(dataset_path, plot_files):
     path = dataset_path + plot_files[0] + '.csv'
     df_header = pd.read_csv(path, header=None, nrows=1)

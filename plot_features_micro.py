@@ -31,19 +31,19 @@ def plot_one_feature(plot_files, all_file_param, dataset_path, feature):
         print 'Ploting ' + file.data_name + '...'
         path = dataset_path + file.file_path
         df = pd.read_csv(path)
-        allData = read_dataset.microData()
-        allData.get_data(df.values)
+        all_data = read_dataset.microData()
+        all_data.get_data(df.values)
 
         interval = file.interval
         intervel_minute = read_dataset.get_interval_minute(interval)
-        prev_time = allData.data_time[0]
-        for i in range(1, len(allData.data_time)):
-            current_time = allData.data_time[i]
+        prev_time = all_data.data_time[0]
+        for i in range(1, len(all_data.data_time)):
+            current_time = all_data.data_time[i]
             diff = current_time - prev_time
             if not diff.days and diff.seconds / 60 <= intervel_minute:
                 plt.plot(
                     [prev_time, current_time],
-                    allData.read_feature(feature)[i - 1: i + 1],
+                    all_data.read_feature(feature)[i - 1: i + 1],
                     c=color
                 )
             prev_time = current_time
