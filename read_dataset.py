@@ -54,6 +54,29 @@ class microData:
         self.wind_dir = data[:, 8]
         self.wind_ms = data[:, 9]
 
+    def read_feature(self, feature):
+        if feature == 'percip_mm':
+            return self.percip_mm
+        elif feature == 'humidity':
+            return self.humidity
+        elif feature == 'temp':
+            return self.temp
+        elif feature == 'leafwet450_min':
+            return self.leafwet450_min
+        elif feature == 'leafwet460_min':
+            return self.leafwet460_min
+        elif feature == 'leafwet_lwscnt':
+            return self.leafwet_lwscnt
+        elif feature == 'gusts_ms':
+            return self.gusts_ms
+        elif feature == 'wind_dir':
+            return self.wind_dir
+        elif feature == 'wind_ms':
+            return self.wind_ms
+        else:
+            print 'Wrong feature', feature
+            return []
+
 '''
 Assign the time from raw string in the file to datetime object.
 @param {string} time

@@ -103,6 +103,6 @@ def main():
     legend = plot_for_legend.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
                                     fancybox=True, shadow=True, ncol=2)
     plt.suptitle('Missing Intervals for the Dataset')
-    plt.show()
+    plt.savefig('missing_intervals_for_the_dataset.png')
 
 main()
