@@ -36,7 +36,7 @@ def split_and_build_class(X, y):
     return [X_train, X_test, y_train, y_test, train_data, test_data]
 
 def run_sgd_regression(X, y):
-    clf = linear_model.SGDRegressor()
+    clf = linear_model.SGDRegressor(loss='squared_epsilon_insensitive')
     clf.fit(X, y)
     return clf
 
@@ -92,8 +92,7 @@ def main():
         plt.plot([i for i in xrange(test_size)], y_hat_test)
         plt.plot([i for i in xrange(test_size)], y_test)
         plt.legend(['Predicted test data', 'Test data'])
-        # plt.show()
-
-        print 'square loss =', mean_squared_error(y_test, y_hat_test)
+        plt.suptitle('Cross validation of all points.')
+        plt.savefig('cross_validation_all_points.png', bbox_inches='tight')
 
 main()
