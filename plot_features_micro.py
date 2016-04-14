@@ -37,7 +37,7 @@ def plot_one_feature(plot_files, all_file_param, dataset_path, feature):
         interval = file.interval
         intervel_minute = read_dataset.get_interval_minute(interval)
         prev_time = all_data.data_time[0]
-        for i in range(1, len(all_data.data_time)):
+        for i in xrange(1, len(all_data.data_time)):
             current_time = all_data.data_time[i]
             diff = current_time - prev_time
             if not diff.days and diff.seconds / 60 <= intervel_minute:

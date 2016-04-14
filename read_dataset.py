@@ -56,7 +56,12 @@ class microData:
         self.wind_ms = data[:, 9]
 
     def set_output(self, data):
-        self.output = data[:, 1]
+        tmp = []
+        for row in data[:, 1]:
+            tmp.append(row)
+        tmp = np.array(tmp)
+        self.output = tmp
+        return tmp
 
     def read_feature(self, feature):
         if feature == 'percip_mm':
