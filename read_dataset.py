@@ -123,3 +123,9 @@ def read_all_dataset(path):
         file_param.get_param(row)
         all_file_param.append(file_param)
     return all_file_param
+
+def set_features(dataset_path, plot_files):
+    path = dataset_path + plot_files[0] + '.csv'
+    df_header = pd.read_csv(path, header=None, nrows=1)
+    micro_features = df_header.values[0][1:]
+    return micro_features

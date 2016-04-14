@@ -10,7 +10,7 @@ def plot_one_feature(plot_files, all_file_param, dataset_path, feature):
 
     # Initiate the plot.
     cmap = plt.get_cmap('jet_r')
-    plt.figure(figsize=(20, 10))
+    plt.figure(figsize=(25, 10))
     # plot_for_legend = plt.subplot()
 
     # Color setup for single file.
@@ -55,7 +55,7 @@ def plot_one_feature(plot_files, all_file_param, dataset_path, feature):
 
     plt.legend(plot_files)
     plt.suptitle(feature + ' in ' + str(plot_files))
-    plt.savefig('./micro_features_plot/' + feature + '.png')
+    plt.savefig('./micro_features_plot/' + feature + '.png', bbox_inches='tight')
 
 def main():
     # Read the dataset.
@@ -68,10 +68,7 @@ def main():
     #               'Training set Microclimate (5 minute intervals)']
 
     # Set up features for micro files.
-    path = dataset_path + plot_files[0] + '.csv'
-    df_header = pd.read_csv(path, header=None, nrows=1)
-    micro_features = df_header.values[0][1:]
-    print micro_features
+    micro_features = read_dataset.set_features(dataset_path, plot_files)
 
     for feature in micro_features:
         plot_one_feature(plot_files, all_file_param, dataset_path, feature)
