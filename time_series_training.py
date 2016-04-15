@@ -10,9 +10,14 @@ from sklearn.metrics import mean_squared_error
 import read_dataset
 
 def split_and_build_class(X, y):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    X_train = X[: 4061]
+    X_test = X[4061:]
+    y_train = y[: 4061]
+    y_test = y[4061:]
     print X_train.shape
     print X_test.shape
+
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
     # Normalize the input data.
     imp = preprocessing.Imputer(missing_values='NaN', strategy='mean', axis=0)
@@ -94,9 +99,10 @@ def main():
         plt.plot([i for i in xrange(test_size)], y_hat_test)
         plt.plot([i for i in xrange(test_size)], y_test)
         plt.legend(['Predicted test data', 'Test data'])
-        plt.suptitle('Cross validation of all points.')
-        plt.savefig('cross_validation_all_points.png', bbox_inches='tight')
+        plt.suptitle('Time series of all points.')
+        plt.savefig('time_series_all_points.png', bbox_inches='tight')
 
-        # print 'Cross Validation loss =', clf.score(X_test[:, 1:], y_test)
-        print 'Cross Validation loss =', mean_squared_error(y_test, y_hat_test)
+        # print 'Time series loss =', clf.score(X_test[:, 1:], y_test)
+        print 'Time series loss =', mean_squared_error(y_test, y_hat_test)
+
 main()
