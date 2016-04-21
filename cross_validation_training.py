@@ -93,7 +93,7 @@ def main():
         test_size = y_hat_test.shape[0]
         plt.plot([i for i in xrange(test_size)], y_hat_test)
         plt.plot([i for i in xrange(test_size)], y_test)
-        plt.legend(['Test data', 'Training data'])
+        plt.legend(['Prediction', 'Real'])
         plt.suptitle('Cross validation of all points.')
         plt.savefig('cross_validation_all_points.png', bbox_inches='tight')
 

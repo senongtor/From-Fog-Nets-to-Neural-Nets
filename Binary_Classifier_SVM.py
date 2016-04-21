@@ -6,9 +6,11 @@ from sklearn.cross_validation import train_test_split
 import sklearn.preprocessing as preprocessing
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
+from sklearn import svm
 
 import write_submission
 import read_dataset
+import Binary_Classification
 
 def split_and_build_class(X, y):
     X_train = X[: 4061]
@@ -25,13 +27,13 @@ def split_and_build_class(X, y):
     fixed_X_train = X_train[:, 1:]
     imp.fit(fixed_X_train)
     fixed_X_train = imp.transform(fixed_X_train)
-    # preprocessing.normalize(fixed_X_train, copy=False)
+    preprocessing.normalize(fixed_X_train, copy=False)
     X_train[:, 1:] = fixed_X_train
 
     fixed_X_test = X_test[:, 1:]
     imp.fit(fixed_X_test)
     fixed_X_test = imp.transform(fixed_X_test)
-    # preprocessing.normalize(fixed_X_test, copy=False)
+    preprocessing.normalize(fixed_X_test, copy=False)
     X_test[:, 1:] = fixed_X_test
 
     train_data = read_dataset.microData()
@@ -44,7 +46,7 @@ def split_and_build_class(X, y):
     return [X_train, X_test, y_train, y_test, train_data, test_data]
 
 def run_regression(X, y):
-    clf = linear_model.Ridge(normalize=True)
+    clf = svm.LinearSVC()
     clf.fit(X, y)
     return clf
 
@@ -86,9 +88,48 @@ def main():
         X_train, X_test, y_train, y_test, train_data, test_data = split_and_build_class(df.values, yield_df.values)
         # [train_data, test_data] = split_and_build_class(df.values, yield_df.values)
 
+        y_train_binary = Binary_Classification.transform_to_binary(y_train)
+
+        # Run SVM.
+        clf = run_regression(X_train[:, 1:], y_train_binary)
+        y_hat_test_binary = clf.predict(X_test[:, 1:])
+        print 'Number of Class 1 in Training Data:', np.count_nonzero(y_train_binary)
+        print 'Number of Class 1 in Test Data:', np.count_nonzero(y_test)
+        print 'Number of Class 1 in Predicted Data:', np.count_nonzero(y_hat_test_binary)
+
         # Run Ridge Regression.
-        clf = run_regression(X_train[:, 1:], y_train)
-        y_hat_test = clf.predict(X_test[:, 1:])
+        X_train_regression = []
+        y_train_regression = []
+        X_test_regression = []
+        y_hat_test_regression = []
+
+        for i in xrange(len(y_train_binary)):
+            if y_train_binary[i] != 0:
+                X_train_regression.append(X_train[i])
+                y_train_regression.append(y_train[i])
+        X_train_regression = np.array(X_train_regression)
+        clf_regression = linear_model.Ridge()
+        clf_regression.fit(X_train_regression[:, 1:], y_train_regression)
+
+        for i in xrange(len(y_hat_test_binary)):
+            if y_hat_test_binary[i] != 0:
+                X_test_regression.append(X_test[i])
+        X_test_regression = np.array(X_test_regression)
+        if len(X_test_regression):
+            y_hat_test_regression = clf_regression.predict(X_test_regression[:, 1:])
+
+        j = 0
+        y_hat_test = []
+        if len(X_test_regression):
+            for i in xrange(len(y_hat_test_binary)):
+                if y_hat_test_binary[i] == 0:
+                    y_hat_test.append(y_hat_test_binary[i])
+                else:
+                    y_hat_test.append(y_hat_test_regression[j])
+                    j += 1
+            y_hat_test = np.array(y_hat_test)
+        else:
+            y_hat_test = y_hat_test_binary
 
         cmap = plt.get_cmap('jet_r')
         plt.figure(figsize=(10, 10))
@@ -101,7 +142,7 @@ def main():
         plt.plot([i for i in xrange(test_size)], y_test)
         plt.legend(['Prediction', 'Real'])
         plt.suptitle('Time series of all points.')
-        plt.savefig('time_series_all_points_ridge_regression.png', bbox_inches='tight')
+        plt.savefig('time_series_all_points_SVM_and_ridge_regression.png', bbox_inches='tight')
 
         # print 'Time series loss =', clf.score(X_test[:, 1:], y_test)
         print 'Time series loss =', mean_squared_error(y_test, y_hat_test)
@@ -138,6 +179,6 @@ def main():
         imp.fit(fixed_X)
         X_combined.values[:, 0:] = imp.transform(fixed_X)
         y_submission = write_submission.write_submission(
-            X_combined, clf, df_submission, 'Ridge Regression Submission')
+            X_combined, clf, df_submission, 'Binary Classifier SVM Submission')
 
 main()
