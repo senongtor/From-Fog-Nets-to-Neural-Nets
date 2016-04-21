@@ -38,7 +38,7 @@ def split_and_build_class(X, y):
     return [X_train, X_test, y_train, y_test, train_data, test_data]
 
 def run_regression(X, y):
-    clf = linear_model.Ridge(normalize=True, alpha=0.01)
+    clf = linear_model.Ridge(normalize=True)
     clf.fit(X, y)
     return clf
 
@@ -94,9 +94,10 @@ def main():
         plt.plot([i for i in xrange(test_size)], y_hat_test)
         plt.plot([i for i in xrange(test_size)], y_test)
         plt.legend(['Prediction', 'Real'])
-        plt.suptitle('Cross validation of all points.')
-        plt.savefig('cross_validation_all_points.png', bbox_inches='tight')
+        plt.suptitle('Cross validation + Ridge Regression')
+        plt.savefig('Cross validation + Ridge Regression.png', bbox_inches='tight')
 
-        # print 'Cross Validation loss =', clf.score(X_test[:, 1:], y_test)
-        print 'Cross Validation loss =', mean_squared_error(y_test, y_hat_test)
+        loss = np.sqrt(mean_squared_error(y_test, y_hat_test))
+        print 'Cross validation + Ridge Regression loss =', loss
+        
 main()

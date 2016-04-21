@@ -8,31 +8,25 @@ from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
 from sklearn import ensemble
 
-import write_submission
 import read_dataset
 
 def split_and_build_class(X, y):
-    X_train = X[: 4061]
-    X_test = X[4061:]
-    y_train = y[: 4061]
-    y_test = y[4061:]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     print X_train.shape
     print X_test.shape
-
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
     # Normalize the input data.
     imp = preprocessing.Imputer(missing_values='NaN', strategy='mean', axis=0)
     fixed_X_train = X_train[:, 1:]
     imp.fit(fixed_X_train)
     fixed_X_train = imp.transform(fixed_X_train)
-    # preprocessing.normalize(fixed_X_train, copy=False)
+    preprocessing.normalize(fixed_X_train, copy=False)
     X_train[:, 1:] = fixed_X_train
 
     fixed_X_test = X_test[:, 1:]
     imp.fit(fixed_X_test)
     fixed_X_test = imp.transform(fixed_X_test)
-    # preprocessing.normalize(fixed_X_test, copy=False)
+    preprocessing.normalize(fixed_X_test, copy=False)
     X_test[:, 1:] = fixed_X_test
 
     train_data = read_dataset.microData()
@@ -45,8 +39,7 @@ def split_and_build_class(X, y):
     return [X_train, X_test, y_train, y_test, train_data, test_data]
 
 def run_regression(X, y):
-    clf = linear_model.Ridge(normalize=True)
-    # clf = ensemble.BaggingRegressor(n_estimators=1000)
+    clf = ensemble.BaggingRegressor(n_estimators=1000)
     clf.fit(X, y)
     return clf
 
@@ -102,45 +95,10 @@ def main():
         plt.plot([i for i in xrange(test_size)], y_hat_test)
         plt.plot([i for i in xrange(test_size)], y_test)
         plt.legend(['Prediction', 'Real'])
-        plt.suptitle('Time series of all points.')
-        plt.savefig('time_series_all_points_ridge_regression.png', bbox_inches='tight')
+        plt.suptitle('Cross validation + Bagging Regressor')
+        plt.savefig('Cross validation + Bagging Regressor.png', bbox_inches='tight')
 
-        # print 'Time series loss =', clf.score(X_test[:, 1:], y_test)
-        print 'Time series loss =', mean_squared_error(y_test, y_hat_test)
-
-        '''
-        =======================================================================
-        '''
-
-        # Predict test and write submission
-        submission_file_name = 'Submission format'
-        submission_file = None
-        test_file_name = 'Test set Microclimate (2 hour intervals)'
-        test_file = None
-
-        for k in xrange(file_amount):
-            file = all_file_param[k]
-            if file.data_name == submission_file_name:
-                submission_file = file
-                break
-        submission_path = dataset_path + submission_file.file_path
-        df_submission = pd.read_csv(submission_path, index_col=0, parse_dates=[0])
-
-        for k in xrange(file_amount):
-            file = all_file_param[k]
-            if file.data_name == test_file_name:
-                test_file = file
-                break
-        test_path = dataset_path + test_file.file_path
-        df_test = pd.read_csv(test_path, index_col=0, parse_dates=[0])
-
-        X_combined = write_submission.combine_table(df_submission, df_test)
-        imp = preprocessing.Imputer(missing_values='NaN', strategy='mean', axis=0)
-        fixed_X = X_combined.values[:, 0:]
-        imp.fit(fixed_X)
-        X_combined.values[:, 0:] = imp.transform(fixed_X)
-        # preprocessing.normalize(fixed_X, copy=False)
-        y_submission = write_submission.write_submission(
-            X_combined, clf, df_submission, 'Ridge Regression Submission')
-
+        loss = np.sqrt(mean_squared_error(y_test, y_hat_test))
+        print 'Cross validation + Bagging Regressor loss =', loss
+        
 main()

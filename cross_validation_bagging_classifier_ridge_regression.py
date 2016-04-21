@@ -14,10 +14,11 @@ import read_dataset
 import Binary_Classification
 
 def split_and_build_class(X, y):
-    X_train = X[: 4061]
-    X_test = X[4061:]
-    y_train = y[: 4061]
-    y_test = y[4061:]
+    # X_train = X[: 4061]
+    # X_test = X[4061:]
+    # y_train = y[: 4061]
+    # y_test = y[4061:]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     print X_train.shape
     print X_test.shape
 
@@ -109,8 +110,17 @@ def main():
                 X_train_regression.append(X_train[i])
                 y_train_regression.append(y_train[i])
         X_train_regression = np.array(X_train_regression)
-        clf_regression = ensemble.BaggingRegressor(n_estimators=1000)
-        clf_regression.fit(X_train_regression[:, 1:], y_train_regression)
+
+        '''
+        =====Regression=====
+        '''
+        clf_regression = linear_model.Ridge(normalize=True)
+        # clf_regression.fit(X_train_regression[:, 1:], y_train_regression)
+        clf_regression.fit(X_train[:, 1:], y_train)
+        '''
+        ====================
+        '''
+
 
         for i in xrange(len(y_hat_test_binary)):
             if y_hat_test_binary[i] != 0:
@@ -142,11 +152,11 @@ def main():
         plt.plot([i for i in xrange(test_size)], y_hat_test)
         plt.plot([i for i in xrange(test_size)], y_test)
         plt.legend(['Prediction', 'Real'])
-        plt.suptitle('Time series of all points.')
-        plt.savefig('time_series_all_points_Bagging_and_ridge_regression.png', bbox_inches='tight')
+        plt.suptitle('Cross Validation + Bagging Classifier + Ridge Regression')
+        plt.savefig('Cross Validation + Bagging Classifier + Ridge Regression.png', bbox_inches='tight')
 
-        # print 'Time series loss =', clf.score(X_test[:, 1:], y_test)
-        print 'Time series loss =', mean_squared_error(y_test, y_hat_test)
+        loss = np.sqrt(mean_squared_error(y_test, y_hat_test))
+        print 'Cross Validation + Bagging Classifier + Ridge Regression loss =', loss
 
         '''
         =======================================================================
@@ -181,6 +191,7 @@ def main():
         X_combined.values[:, 0:] = imp.transform(fixed_X)
         preprocessing.normalize(X_combined.values, copy=False)
         y_submission = write_submission.write_submission_binary_classifier_and_regression(
-            X_combined, clf, clf_regression, df_submission, 'Binary Classifier Bagging Submission')
+            X_combined, clf, clf_regression, df_submission,
+            'Cross Validation + Bagging Classifier + Ridge Regression Submission')
 
 main()
