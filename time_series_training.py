@@ -6,6 +6,7 @@ from sklearn.cross_validation import train_test_split
 import sklearn.preprocessing as preprocessing
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
+from sklearn import ensemble
 
 import write_submission
 import read_dataset
@@ -45,6 +46,7 @@ def split_and_build_class(X, y):
 
 def run_regression(X, y):
     clf = linear_model.Ridge(normalize=True)
+    # clf = ensemble.BaggingRegressor(n_estimators=1000)
     clf.fit(X, y)
     return clf
 
@@ -137,6 +139,7 @@ def main():
         fixed_X = X_combined.values[:, 0:]
         imp.fit(fixed_X)
         X_combined.values[:, 0:] = imp.transform(fixed_X)
+        # preprocessing.normalize(fixed_X, copy=False)
         y_submission = write_submission.write_submission(
             X_combined, clf, df_submission, 'Ridge Regression Submission')
 

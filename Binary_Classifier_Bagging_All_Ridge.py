@@ -7,6 +7,7 @@ import sklearn.preprocessing as preprocessing
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
 from sklearn import svm
+from sklearn import ensemble
 
 import write_submission
 import read_dataset
@@ -46,7 +47,7 @@ def split_and_build_class(X, y):
     return [X_train, X_test, y_train, y_test, train_data, test_data]
 
 def run_regression(X, y):
-    clf = svm.LinearSVC()
+    clf = ensemble.BaggingClassifier(n_estimators=1000)
     clf.fit(X, y)
     return clf
 
@@ -108,8 +109,9 @@ def main():
                 X_train_regression.append(X_train[i])
                 y_train_regression.append(y_train[i])
         X_train_regression = np.array(X_train_regression)
-        clf_regression = linear_model.Ridge()
-        clf_regression.fit(X_train_regression[:, 1:], y_train_regression)
+        # clf_regression = ensemble.BaggingRegressor(n_estimators=1000)
+        clf_regression = linear_model.Ridge(normalize=True)
+        clf_regression.fit(X_train[:, 1:], y_train)
 
         for i in xrange(len(y_hat_test_binary)):
             if y_hat_test_binary[i] != 0:
@@ -142,7 +144,7 @@ def main():
         plt.plot([i for i in xrange(test_size)], y_test)
         plt.legend(['Prediction', 'Real'])
         plt.suptitle('Time series of all points.')
-        plt.savefig('time_series_all_points_SVM_and_ridge_regression.png', bbox_inches='tight')
+        plt.savefig('time_series_all_points_Bagging_and_all_ridge_regression.png', bbox_inches='tight')
 
         # print 'Time series loss =', clf.score(X_test[:, 1:], y_test)
         print 'Time series loss =', mean_squared_error(y_test, y_hat_test)
@@ -180,6 +182,7 @@ def main():
         X_combined.values[:, 0:] = imp.transform(fixed_X)
         preprocessing.normalize(X_combined.values, copy=False)
         y_submission = write_submission.write_submission_binary_classifier_and_regression(
-            X_combined, clf, clf_regression, df_submission, 'Binary Classifier SVM Submission')
+            X_combined, clf, clf_regression, df_submission,
+            'Binary Classifier Bagging with All Ridge Submission')
 
 main()
