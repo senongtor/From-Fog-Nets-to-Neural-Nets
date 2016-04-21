@@ -19,13 +19,13 @@ def split_and_build_class(X, y):
     fixed_X_train = X_train[:, 1:]
     imp.fit(fixed_X_train)
     fixed_X_train = imp.transform(fixed_X_train)
-    preprocessing.normalize(fixed_X_train, copy=False)
+    # preprocessing.normalize(fixed_X_train, copy=False)
     X_train[:, 1:] = fixed_X_train
 
     fixed_X_test = X_test[:, 1:]
     imp.fit(fixed_X_test)
     fixed_X_test = imp.transform(fixed_X_test)
-    preprocessing.normalize(fixed_X_test, copy=False)
+    # preprocessing.normalize(fixed_X_test, copy=False)
     X_test[:, 1:] = fixed_X_test
 
     train_data = read_dataset.microData()
@@ -37,8 +37,8 @@ def split_and_build_class(X, y):
 
     return [X_train, X_test, y_train, y_test, train_data, test_data]
 
-def run_sgd_regression(X, y):
-    clf = linear_model.LinearRegression()
+def run_regression(X, y):
+    clf = linear_model.Ridge(normalize=True, alpha=0.01)
     clf.fit(X, y)
     return clf
 
@@ -80,8 +80,8 @@ def main():
         X_train, X_test, y_train, y_test, train_data, test_data = split_and_build_class(df.values, yield_df.values)
         # [train_data, test_data] = split_and_build_class(df.values, yield_df.values)
 
-        # Run SGD Regression.
-        clf = run_sgd_regression(X_train[:, 1:], y_train)
+        # Run Ridge Regression.
+        clf = run_regression(X_train[:, 1:], y_train)
         y_hat_test = clf.predict(X_test[:, 1:])
 
         cmap = plt.get_cmap('jet_r')
@@ -93,7 +93,7 @@ def main():
         test_size = y_hat_test.shape[0]
         plt.plot([i for i in xrange(test_size)], y_hat_test)
         plt.plot([i for i in xrange(test_size)], y_test)
-        plt.legend(['Predicted test data', 'Test data'])
+        plt.legend(['Test data', 'Training data'])
         plt.suptitle('Cross validation of all points.')
         plt.savefig('cross_validation_all_points.png', bbox_inches='tight')
 
